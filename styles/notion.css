@@ -166,7 +166,7 @@
 
 .notion-title {
   display: block;
-  text-align: center;
+  text-align: left;
 }
 
 .notion-collection-column-title {
@@ -324,6 +324,7 @@
 
 /* if you don't want rounded page images, remove this */
 .notion-page-icon-wrapper img.notion-page-icon {
+  left: -45%;
   border-radius: 50%;
   box-shadow: 0 8px 40px 0 rgb(0 0 0 / 21%);
 }

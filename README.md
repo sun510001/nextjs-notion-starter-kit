@@ -1,15 +1,20 @@
-# Notion+Next.js建站流程
+# Notion + Next.js 搭建个人博客
 
 Created: December 26, 2021 3:36 PM
+Description: 使用 Next.js 配合 Notion 建立博客的流程介绍.
+Public: Yes
+Published: December 26, 2021
+Tags: Github, Next.js, Node.js, Notion
 
-# 0. 起因
+# 0. 背景
 
 最近想整一个个人主页玩玩, 可是平时时间紧张, 所以需要一个建立之后, 可以快速编写博文或直接从我的笔记转换为博文, 并且需要能够快速简单的上传方式. 
 
 目前, 本人使用的笔记工具正是Notion, 并且有personal pro可以无限制上传文件. 于是使用Notion建站的话, 图床之类的问题也一并解决了(Github Pages显示1G的存贮, 长期写博文的话需要图床的支持). 另外, Notion的建站有两种方式, 本次介绍的**方式**和**需要购买独立域名并且配合Cloudflare DNS重定位服务的方式**. 后者需要购买独立域名(可能还需要备案), 并且部分域名可能需要修改DNS才能被Cloudflare识别, 试了两天还是放弃了. 本次介绍的方式无需考虑费用问题且建站调试也更快一些. 
 
-- 本文面向对计算机和前端有一定知识同学.
-- 原项目的说明文档为`readme_original.md`.
+- 本文面向
+- 对计算机和前端有一定知识同学.
+- 不过其实只用Notion建站也够了, 就是样式简陋点, 但是好歹没有bug. 🤣
 
 # 1. 涉及到的服务和项目
 
@@ -38,94 +43,73 @@ Created: December 26, 2021 3:36 PM
 1. 在本地安装Node.js, 一路默认设置点确定即可.
 2. 解压**nextjs-notion-starter-kit**项目的[压缩包](https://github.com/transitive-bullshit/nextjs-notion-starter-kit/archive/refs/heads/main.zip).
 3. 打开终端. 进入项目的根目录. 配置项目.
-   
-    ```bash
-    # 安装npm, 如果报错的话使用: npm i --legacy-peer-deps
-    npm install 
-    
-    # 安装vercel服务
-    npm i -g vercel
-    
-    # 上传一次项目, 初次上传时需要选择进行一些配置, 
-    # 中途需要将vercel和github连接一次, 其他情况一路回车就行.
-    npm run deploy
-    ```
-    
-    - 使用项目上传完成后, 登录 [https://vercel.com/](https://vercel.com/), 可以找到刚刚上传的项目. 点击Visit可以查看建立的网站.
-      
-        ![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled.png)
-        
-    - 使用默认的项目 **nextjs-notion-starter-kit** 上传的话会看到如下画面.
-      
-        ![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled%201.png)
-        
-    - 如果觉得这个网页样式不错, 可以打开[原项目作者的Notion主页](https://www.notion.so/TransitiveBullsh-it-78fc5a4b88d74b0e824e29407e9f1ec1), 点击右上角的Duplicate, 将他的主页复制到自己的Notion, 然后按需复制组件到自己的主页里(比如网页中的表格).
+
+```bash
+# 安装npm, 如果报错的话使用: npm i --legacy-peer-deps
+npm install 
+
+# 安装vercel服务
+npm i -g vercel
+
+# 上传一次项目, 初次上传时需要选择进行一些配置, 
+# 中途需要将vercel和github连接一次, 其他情况一路回车就行.
+npm run deploy
+```
 
 ## 2.3. 开始调试
 
 - 首先打开Notion, 新建一篇笔记作为自己的站点首页, 在右上角点击`Share` 将这一页设为公开. 按自己的需求可以允许被他人吐槽, 被搜索引擎发现或被人复制网站所有内容等功能.
-  
-    ![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled%202.png)
-    
+
+![Untitled](Notion%20+%20Next%20js%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%208c178997055c43a2bb2320ca9060787f/Untitled.png)
+
 - 查看当前页面的URL(不是Share里的URL, 是浏览器里的URL)
-  
-    ```bash
-    # URL例子:
-    https://www.notion.so/travis-fischer/TransitiveBullsh-it-78fc5a4b88d74b0e824e29407e9f1ec1
-    # 则需要记下后面的编号, 这个编号是之后需要的rootNotionPageId
-    78fc5a4b88d74b0e824e29407e9f1ec1
-    ```
-    
+
+```bash
+# URL例子:
+https://www.notion.so/travis-fischer/TransitiveBullsh-it-78fc5a4b88d74b0e824e29407e9f1ec1
+# 则需要记下后面的编号, 这个编号是之后需要的rootNotionPageId
+78fc5a4b88d74b0e824e29407e9f1ec1
+```
+
 - 回到本地, 打开项目中的`site.config.js`.
-  
-    ```jsx
-      // 修改为自己的rootNotionPageId
-      rootNotionPageId: '78fc5a4b88d74b0e824e29407e9f1ec1'
-    
-      // 以下按需修改############################################################
-      // basic site info (required)
-      name: 'Homepage',
-      domain: 'sun',
-      author: 'sun',
-    
-      // open graph metadata (optional)
-      description: 'Example site description',
-      socialImageTitle: 'sun',
-      socialImageSubtitle: 'Hello World!',
-      // 以上按需修改############################################################
-    
-      // social usernames (optional) 只填自己需要的, 填用户名. 
-      // 这几个不留空的话, 会以图标的形式显示在页面的右侧.
-      twitter: '',
-      github: '',
-      linkedin: '',
-    ```
-    
+
+```jsx
+  // 修改为自己的rootNotionPageId
+  rootNotionPageId: '78fc5a4b88d74b0e824e29407e9f1ec1'
+
+  // 以下按需修改############################################################
+  // basic site info (required)
+  name: 'Homepage',
+  domain: 'sun',
+  author: 'sun',
+
+  // open graph metadata (optional)
+  description: 'Example site description',
+  socialImageTitle: 'sun',
+  socialImageSubtitle: 'Hello World!',
+  // 以上按需修改############################################################
+
+  // social usernames (optional) 只填自己需要的, 填用户名. 
+  // 这几个不留空的话, 会以图标的形式显示在页面的右侧.
+  twitter: '',
+  github: '',
+  linkedin: '',
+```
+
 - 启动网页本地调试模式
     - 终端进入项目文件夹路径, 使用以下命令进入调试, 打开网址 [http://localhost:3000](http://localhost:3000/), 显示调试页面.
-      
-        ```jsx
-        npm run dev
-        ```
+    
+    ```jsx
+    npm run dev
+    ```
     
 - 处理网页右上角的Github项目标志
-  
+    
     目前点击这个图标会进入, 项目原作者的Github项目.
     
-    ![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled%203.png)
-    
-    - 如果需要去掉
-      
-        在项目中打开`components/NotionPage.tsx`, 找到`<GitHubShareButton />` 删除, 记得删除空行.
-        
-        同时删除上方的`import { GitHubShareButton } from './GitHubShareButton'` .
-        
-    - 如果需要将标志连接修改为自己的项目链接
-      
-        在项目中打开`components/GitHubShareButton.tsx`, 直接修改Github连接就行.
-        
-        ![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled%204.png)
-    
+
+![Untitled](Notion%20+%20Next%20js%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%208c178997055c43a2bb2320ca9060787f/Untitled%201.png)
+
 - 各种网站的图标可以在`public`文件夹中替换修改.
 - 进阶: 调式主页的页面样式
     - 在项目中打开`styles/notion.css`, 可以进行各种参数设置.
@@ -137,30 +121,44 @@ Created: December 26, 2021 3:36 PM
 - 在表格中新建一行, 然后在Name列点击Open打开新的一页, 开始写文章.
 - 点击`Public`即可公布想要公布的文章.
 
-![Untitled](Notion+Next%20js%E5%BB%BA%E7%AB%99%E6%B5%81%E7%A8%8B%20cfdd232803164a19b35161eac5259330/Untitled%205.png)
+![Untitled](Notion%20+%20Next%20js%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%208c178997055c43a2bb2320ca9060787f/Untitled%202.png)
 
-# 4. 可能出现的报错
+# 4. 连接私有域名
+
+- Vercel进入设置界面, 在`Domains`添加私有域名.
+
+![Untitled](Notion%20+%20Next%20js%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%208c178997055c43a2bb2320ca9060787f/Untitled%203.png)
+
+- 编辑下方之前自动生成的域名, 选择刚添加的私有域名即可.
+
+![Untitled](Notion%20+%20Next%20js%20%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2%208c178997055c43a2bb2320ca9060787f/Untitled%204.png)
+
+# 5. 可能出现的报错
 
 - 调试的时候出现以下警告:
-  
-    ```jsx
-    (node:5656) [DEP0128] DeprecationWarning: Invalid 'main' field in 'D:\code_project\nextjs-notion-starter-kit\node_modules\react-icons\package.json' of 'lib'. Please either fix that or report it to the module author
-    (Use `node --trace-deprecation ...` to show where the warning was created)
-    ```
-    
-    解决方法: 打开`node_modules/react-icons/lib/package.json`. 删除并替换代码. (原代码不能注释, 一定要删除.)
-    
-    ```jsx
-    // 原本的代码
-      "main": "lib",
-    
-    // 替换为
-      "main": "./lib/cjs/index.js",
-      "module": "./lib/esm/index.js",
-      "exports": {
-        ".": {
-          "require": "./lib/cjs/index.js",
-          "default": "./lib/esm/index.js"
-        }
-      },
-    ```
+
+```bash
+(node:5656) [DEP0128] DeprecationWarning: Invalid 'main' field in 'D:\code_project\nextjs-notion-starter-kit\node_modules\react-icons\package.json' of 'lib'. Please either fix that or report it to the module author
+(Use `node --trace-deprecation ...` to show where the warning was created)
+```
+
+解决方法: 打开`node_modules/react-icons/lib/package.json`. 删除并替换代码. (原代码不能注释, 一定要删除.)
+
+```jsx
+// 原本的代码
+  "main": "lib",
+
+// 替换为
+  "main": "./lib/cjs/index.js",
+  "module": "./lib/esm/index.js",
+  "exports": {
+    ".": {
+      "require": "./lib/cjs/index.js",
+      "default": "./lib/esm/index.js"
+    }
+  },
+```
+
+- 使用网页搜索功能时卡住不出结果
+    - 原因: 没有修改`site.config.js`中的`domain`参数
+    - 解决方法: 需要将`domain`参数改为自己的网站网址.

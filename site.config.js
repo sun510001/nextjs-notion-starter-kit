@@ -7,9 +7,9 @@ module.exports = {
   rootNotionSpaceId: null,
 
   // basic site info (required)
-  name: 'Homepage',
-  domain: 'sun',
-  author: 'sun',
+  name: 'Homepage-web',
+  domain: 'sun2021.store',
+  author: 'Sun',
 
   // open graph metadata (optional)
   description: 'Example site description',
